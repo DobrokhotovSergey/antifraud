@@ -1,10 +1,12 @@
 package ua.varus.antifraud.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,10 +16,13 @@ import java.util.Set;
 @Builder
 public class User {
     private String username;
+    @JsonIgnore
     private String password;
     private String position;
     private String firstname;
     private String lastname;
     private boolean enabled;
+    private boolean online;
+    private Date lastLoginDate;
     private Set<UserRole> userRole = new HashSet<UserRole>(0);
 }

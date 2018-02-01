@@ -1,17 +1,25 @@
 package ua.varus.antifraud.controller;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ua.varus.antifraud.domain.User;
 import ua.varus.antifraud.service.UserDetailsServiceImpl;
+import ua.varus.antifraud.service.UserService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @RestController
@@ -20,32 +28,59 @@ public class UserController {
 	@Autowired
 	private UserDetailsServiceImpl userDetailsService;
 
-	@RequestMapping(value = {"/","/welcome"}, method = RequestMethod.GET)
+	@Autowired
+	private UserService userService;
+
+	@RequestMapping(value = {"/"}, method = RequestMethod.GET)
 	public ModelAndView defaultPage() {
-
-		ModelAndView model = new ModelAndView();
-		model.addObject("title", "Spring Security Login Form - Database Authentication");
-		model.addObject("message", "This is default page!");
-		model.setViewName("hello");
-		return model;
-
+		return new ModelAndView("redirect:login");
 	}
 
+	private volatile Cache<String, byte[]> cache = CacheBuilder.newBuilder()
+			.concurrencyLevel(30)
+			.expireAfterWrite(7, TimeUnit.HOURS)
+			.initialCapacity(500)
+			.maximumSize(3000).softValues().build();
+
+	@Secured({"ROLE_ADMIN"})
+	@RequestMapping(value = "/admin/ajax/getOnlineUsers",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<User> getOnlineUsers(){
+        System.out.println(userService.getOnlineUsers());
+		return  userService.getOnlineUsers();
+	}
+
+	@Secured({"ROLE_USER", "ROLE_ADMIN"})
+	@RequestMapping(value = "/admin/getAvatar/{userName}", method=RequestMethod.GET)
+	public @ResponseBody
+	byte[] getAvatar(@PathVariable String userName, HttpServletResponse response) {
+
+		response.setHeader("Cache-Control", "max-age=604800, only-if-cached");
+		response.setHeader("Pragma", "cache");
+		response.setHeader("User-Cache-Control", "max-age=604800");
+		response.setDateHeader("Expires", System.currentTimeMillis() + 604800000L);
+		byte[] byteCache = cache.getIfPresent(userName);
+		if(byteCache != null){
+			return byteCache;
+		}
+		byte[] imageBytes = userService.getAvatar(userName);
+		if(imageBytes!=null){
+			cache.put(userName, imageBytes);
+		}
+
+		return imageBytes;
+	}
 
 	@RequestMapping(value = "/admin**", method = RequestMethod.GET)
 	public ModelAndView adminPage(Authentication auth) {
 		User user = userDetailsService.getUser(((UserDetails)auth.getPrincipal()).getUsername());
 		ModelAndView model = new ModelAndView();
-//		User user = (User) userDetailsService.loadUserByUsername(auth.getName());
-//		model.setViewName("admin");
-//
 		model.addObject("login", user.getUsername());
 		model.addObject("firstname", user.getFirstname());
 		model.addObject("lastname", user.getLastname());
 		model.addObject("position", user.getPosition());
 
 		return model;
-
 	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
@@ -65,7 +100,14 @@ public class UserController {
 		return model;
 
 	}
-
+	@RequestMapping(value="/logout", method = RequestMethod.GET)
+	public ModelAndView logoutPage (HttpServletRequest request, HttpServletResponse response) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null){
+			new SecurityContextLogoutHandler().logout(request, response, auth);
+		}
+		return new ModelAndView("redirect:/login?logout");
+	}
 
 	@RequestMapping(value = "/403", method = RequestMethod.GET)
 	public ModelAndView accesssDenied() {

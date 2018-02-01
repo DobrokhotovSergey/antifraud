@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import ua.varus.antifraud.domain.User;
 import ua.varus.antifraud.jdbc.UserRowMapperImpl;
 
+import java.util.List;
+
 @Repository
 @Slf4j
 public class UserDaoImpl implements UserDao {
@@ -20,6 +22,9 @@ public class UserDaoImpl implements UserDao {
                     Constants.TABLE_USERS+" u " +
             "join "+Constants.TABLE_USER_ROLES+" r on u.username = r.username where u.username =?";
 
+    private static final String GET_ALL_USERS =
+            "select a.user_role_id, a.userName, a.role,b.password, b.enabled, b.firstname, b.lastname, b.position from "+
+            Constants.TABLE_USER_ROLES +" a join "+ Constants.TABLE_USERS +" b on a.userName = b.userName";
 
     @Override
     public User findByUserName(String username) {
@@ -31,5 +36,40 @@ public class UserDaoImpl implements UserDao {
             log.error("Error findByUsername : {}, {}", ExceptionUtils.getMessage(ex), ExceptionUtils.getMessage(ex.getCause()));
         }
         return user;
+    }
+
+    @Override
+    public User createUser(User user) {
+        return null;
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        try{
+            List<User> list = jdbcTemplate.query(GET_ALL_USERS, new UserRowMapperImpl());
+            return list;
+        }catch (Exception ex){
+            log.error("Error getAllUsers : {}, {}", ExceptionUtils.getMessage(ex), ExceptionUtils.getMessage(ex.getCause()));
+
+        }
+        return null;
+    }
+
+    @Override
+    public byte[] getAvatar(String userName) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("select avatar from ");
+        sb.append(Constants.TABLE_USERS);
+        sb.append(" where username = ?");
+        byte[] image = new byte[0];
+        try {
+            image = jdbcTemplate.queryForObject(
+                    sb.toString(),
+                    (rs, rowNum) -> rs.getBytes(1), userName);
+
+        } catch (Exception ex) {
+            log.error("Error getAvatar : {}, {}", ExceptionUtils.getMessage(ex), ExceptionUtils.getMessage(ex.getCause()));
+        }
+        return image;
     }
 }
