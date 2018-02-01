@@ -1,3 +1,6 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@page session="true" contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <!--
 This is a starter template page. Use this page to start your new project from
@@ -5,8 +8,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
 -->
 <html>
 <head>
-	<meta charset="utf-8">
+	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="_csrf" content="${_csrf.token}"/>
+	<meta name="_csrf_header" content="${_csrf.headerName}"/>
 	<title>Admin Page | AntiFraud</title>
 	<!-- Tell the browser to be responsive to screen width -->
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -22,16 +27,20 @@ scratch. This page gets rid of all links and provides the needed markup only.
           apply the skin class to the body tag so the changes take effect. -->
 	<link rel="stylesheet" href="resources/dist/css/skins/skin-blue.min.css">
 
+
+	<link href="resources/nprogress/nprogress.css" rel="stylesheet">
+	<link href="resources/pnotify/pnotify.css" rel="stylesheet">
+	<link href="resources/pnotify/pnotify.buttons.css" rel="stylesheet">
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
-	<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<script src="resources/dist/js/html5shiv.min.js"></script>
+	<script src="resources/dist/js/respond.min.js"></script>
 	<![endif]-->
 
 	<!-- Google Font -->
 	<link rel="stylesheet"
-		  href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+		  href="resources/dist/css/google-font.css">
 </head>
 <!--
 BODY TAG OPTIONS:
@@ -62,7 +71,7 @@ desired effect
 		<!-- Logo -->
 		<a href="index2.html" class="logo">
 			<!-- mini logo for sidebar mini 50x50 pixels -->
-			<span class="logo-mini"><b>A</b>AF</span>
+			<span class="logo-mini"><b>A</b>F</span>
 			<!-- logo for regular state and mobile devices -->
 			<span class="logo-lg"><b>Anti</b>Fraud</span>
 		</a>
@@ -92,7 +101,7 @@ desired effect
 										<a href="#">
 											<div class="pull-left">
 												<!-- User Image -->
-												<img src="resources/project/images/serg.png" class="img-circle" alt="User Image">
+												<img src="/admin/getAvatar/${login}"  onerror="this.src='/resources/project/images/admin.png'" class="user-image" alt="User Image">
 											</div>
 											<!-- Message title and timestamp -->
 											<h4>
@@ -177,7 +186,7 @@ desired effect
 						<!-- Menu Toggle Button -->
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 							<!-- The user image in the navbar-->
-							<img src="resources/project/images/serg.png" class="user-image" alt="User Image">
+							<img src="/admin/getAvatar/${login}"  onerror="this.src='/resources/project/images/admin.png'" class="user-image" alt="User Image">
 							<!-- hidden-xs hides the username on small devices so only the image appears. -->
 							<span class="hidden-xs">${firstname} ${lastname}</span>
 						</a>
@@ -191,27 +200,27 @@ desired effect
 								</p>
 							</li>
 							<!-- Menu Body -->
-							<li class="user-body">
-								<div class="row">
-									<div class="col-xs-4 text-center">
-										<a href="#">Followers</a>
-									</div>
-									<div class="col-xs-4 text-center">
-										<a href="#">Sales</a>
-									</div>
-									<div class="col-xs-4 text-center">
-										<a href="#">Friends</a>
-									</div>
-								</div>
-								<!-- /.row -->
-							</li>
+							<%--<li class="user-body">--%>
+								<%--<div class="row">--%>
+									<%--<div class="col-xs-4 text-center">--%>
+										<%--<a href="#">Followers</a>--%>
+									<%--</div>--%>
+									<%--<div class="col-xs-4 text-center">--%>
+										<%--<a href="#">Sales</a>--%>
+									<%--</div>--%>
+									<%--<div class="col-xs-4 text-center">--%>
+										<%--<a href="#">Friends</a>--%>
+									<%--</div>--%>
+								<%--</div>--%>
+								<%--<!-- /.row -->--%>
+							<%--</li>--%>
 							<!-- Menu Footer-->
 							<li class="user-footer">
 								<div class="pull-left">
-									<a href="#" class="btn btn-default btn-flat">Profile</a>
+									<a href="#" class="btn btn-primary btn-flat">Профиль</a>
 								</div>
 								<div class="pull-right">
-									<a href="#" class="btn btn-default btn-flat">Sign out</a>
+									<a href="/logout" class="btn btn-primary btn-flat">Выйти</a>
 								</div>
 							</li>
 						</ul>
@@ -281,14 +290,36 @@ desired effect
 	<div class="content-wrapper">
 		<!-- Content Header (Page header) -->
 		<section class="content-header">
-			<h1>
-				Page Header
-				<small>Optional description</small>
-			</h1>
-			<ol class="breadcrumb">
-				<li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
-				<li class="active">Here</li>
-			</ol>
+			<div class="box box-primary" id="employeeDiv" class="x_panel" style="display: none">
+				<div class="box-header">
+					<i class="ion ion-clipboard"></i>
+					<h3 class="box-title">Пользователи</h3>
+				</div>
+				<!-- /.box-header -->
+				<div class="box-body">
+					<div class="x_content">
+						<div class="table-responsive">
+							<table id="employee-table" class="table no-margin" style="width: 100%">
+								<thead>
+								<tr>
+									<th>id</th>
+									<th>Логин</th>
+									<th>Пользователь</th>
+
+									<%--<th>position</th>--%>
+									<th>Роль</th>
+									<th>Статус</th>
+									<th>Редактирование</th>
+								</tr>
+								</thead>
+								<tbody>
+
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
 		</section>
 
 		<!-- Main content -->
@@ -396,13 +427,40 @@ desired effect
 
 <!-- jQuery 3 -->
 <script src="resources/jquery/jquery.min.js"></script>
+<script src="resources/project/js/jquery-ui.min.js"></script>
+<script>
+    $.widget.bridge('uibutton', $.ui.button);
+</script>
 <!-- Bootstrap 3.3.7 -->
 <script src="resources/bootstrap/js/bootstrap.min.js"></script>
+<link href="resources/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+<script src="resources/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="resources/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<link href="resources/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+<link href="resources/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+<link href="resources/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+<link href="resources/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+<script src="resources/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
 <!-- AdminLTE App -->
 <script src="resources/dist/js/adminlte.min.js"></script>
+<script src="resources/nprogress/nprogress.js"></script>
+<script src="resources/pnotify/pnotify.js"></script>
+<script src="resources/pnotify/pnotify.buttons.js"></script>
+<script src="resources/build/js/custom.js"></script>
+<script src="resources/project/js/project.js"></script>
+
 
 <!-- Optionally, you can add Slimscroll and FastClick plugins.
      Both of these plugins are recommended to enhance the
      user experience. -->
+<
+<style>
+	.spinner {
+		left: 50%;
+		margin-left: -4em;
+		color: red;
+	}
+</style>>
+
 </body>
 </html>
