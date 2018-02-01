@@ -6,13 +6,11 @@
 
     <context:component-scan base-package="ua.varus.antifraud.controller"/>
 
-    <!--<bean class="atb.util.json.JacksonObjectMapper" id="objectMapper" factory-method="getMapper"/>-->
-
     <!-- Enables the Spring MVC @Controller programming model -->
     <mvc:annotation-driven />
 
-    <!-- serve static resources (*.html, ...) from src/main/webapp/ -->
-    <mvc:default-servlet-handler/>
+    <!--&lt;!&ndash; serve static resources (*.html, ...) from src/main/webapp/ &ndash;&gt;-->
+    <!--<mvc:default-servlet-handler/>-->
 
     <!-- Specifying the Resource location to load JS, CSS, Images etc -->
     <mvc:resources mapping="/resources/**" location="/resources/" />
