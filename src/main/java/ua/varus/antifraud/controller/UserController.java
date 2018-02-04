@@ -10,8 +10,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import ua.varus.antifraud.service.UserValidator;
 import ua.varus.antifraud.domain.User;
 import ua.varus.antifraud.service.UserDetailsServiceImpl;
 import ua.varus.antifraud.service.UserService;
@@ -31,10 +34,24 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private UserValidator userValidator;
+
 	@RequestMapping(value = {"/"}, method = RequestMethod.GET)
 	public ModelAndView defaultPage() {
 		return new ModelAndView("redirect:login");
 	}
+
+	@RequestMapping(value = "/users", method = RequestMethod.GET)
+	public ModelAndView users(){
+		return new ModelAndView("users");
+	}
+
+	@RequestMapping(value = "/dashboard", method = RequestMethod.GET)
+	public ModelAndView dashboard(){
+		return new ModelAndView("dashboard");
+	}
+
 
 	private volatile Cache<String, byte[]> cache = CacheBuilder.newBuilder()
 			.concurrencyLevel(30)
@@ -50,10 +67,45 @@ public class UserController {
 		return  userService.getOnlineUsers();
 	}
 
+
+	@Secured({"ROLE_ADMIN"})
+	@RequestMapping(value = "/admin/ajax/createUser",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public User createUser(@RequestBody User user, BindingResult bindingResult){
+		userValidator.validate(user, bindingResult);
+		if(bindingResult.hasErrors()){
+			System.out.println(bindingResult.getAllErrors());
+			System.out.println("ERROR");
+			return null;
+		}
+		return  userService.createUser(user);
+	}
+
+	@Secured({"ROLE_ADMIN"})
+	@RequestMapping(value = "/admin/ajax/deleteUser",  method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE )
+	@ResponseBody
+	public boolean deleteEmployee(@RequestBody User user){
+		return userService.deleteUser(user);
+	}
+
+	@Secured({"ROLE_ADMIN"})
+	@RequestMapping(value = "/admin/ajax/editUser",  method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public User editUser(@RequestBody User user){
+		return userService.editUser(user);
+	}
+	@Secured({"ROLE_ADMIN"})
+	@RequestMapping(value = "/admin/ajax/uploadUserImage", headers = "content-type=multipart/*",  method = RequestMethod.POST)
+	public @ResponseBody
+	boolean uploadFileHandler(@RequestParam("file") MultipartFile multipartFile, Authentication authentication) {
+		String user = authentication.getName();
+		cache.invalidate(user);
+		return userService.uploadUserImage(multipartFile, user);
+	}
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	@RequestMapping(value = "/admin/getAvatar/{userName}", method=RequestMethod.GET)
-	public @ResponseBody
-	byte[] getAvatar(@PathVariable String userName, HttpServletResponse response) {
+	@ResponseBody
+	public byte[] getAvatar(@PathVariable String userName, HttpServletResponse response) {
 
 		response.setHeader("Cache-Control", "max-age=604800, only-if-cached");
 		response.setHeader("Pragma", "cache");

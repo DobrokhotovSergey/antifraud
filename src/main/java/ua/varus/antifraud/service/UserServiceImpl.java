@@ -7,6 +7,7 @@ import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ua.varus.antifraud.dao.UserDao;
 import ua.varus.antifraud.domain.User;
 
@@ -33,6 +34,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserDao userDao;
+
+
 
     @Override
     public List<Object> getAllPrincipals(){
@@ -96,6 +99,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public byte[] getAvatar(String userName) {
         return userDao.getAvatar(userName);
+    }
+
+    @Override
+    public boolean deleteUser(User user) {
+
+        killSessionUser(user.getUsername());
+
+        return userDao.deleteUser(user);
+    }
+
+    @Override
+    public User editUser(User user) {
+        return userDao.editUser(user);
+    }
+
+    @Override
+    public boolean uploadUserImage(MultipartFile multipartFile, String user) {
+        return userDao.uploadUserImage(multipartFile, user);
     }
 
 }

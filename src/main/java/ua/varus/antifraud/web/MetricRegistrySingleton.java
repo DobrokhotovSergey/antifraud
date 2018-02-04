@@ -1,4 +1,4 @@
-package ua.varus.antifraud.metrics;
+package ua.varus.antifraud.web;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
@@ -13,6 +13,7 @@ public final class MetricRegistrySingleton {
     static {
         final Slf4jReporter reporter = Slf4jReporter.forRegistry(metrics).outputTo(log).convertRatesTo(TimeUnit.SECONDS).convertDurationsTo(TimeUnit.MILLISECONDS).build();
         reporter.start(2, TimeUnit.SECONDS);
+
     }
 
     private MetricRegistrySingleton() {

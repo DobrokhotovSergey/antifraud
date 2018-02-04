@@ -23,9 +23,6 @@ public class UserRowMapperImpl implements RowMapper<User> {
                 .role(rs.getString("role"))
                 .userRoleId(rs.getInt("user_role_id"))
                 .build();
-        Set<UserRole> userRoleSet = new HashSet<>();
-        userRoleSet.add(userRole);
-
 
         User user = User.builder()
                 .username(rs.getString("userName"))
@@ -34,7 +31,7 @@ public class UserRowMapperImpl implements RowMapper<User> {
                 .firstname(rs.getString("firstname"))
                 .lastname(rs.getString("lastname"))
                 .position(rs.getString("position"))
-                .userRole(userRoleSet)
+                .userRole(userRole)
                 .build();
 
         return user;

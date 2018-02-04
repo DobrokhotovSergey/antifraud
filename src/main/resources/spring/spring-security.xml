@@ -14,8 +14,8 @@
 
 		<!-- access denied page -->
 		<security:access-denied-handler error-page="/403" />
-		<security:session-management session-fixation-protection="migrateSession">
-			<security:concurrency-control max-sessions="1" />
+		<security:session-management session-fixation-protection="none">
+			<security:concurrency-control max-sessions="1" session-registry-ref="sessionRegistry" />
 		</security:session-management>
 		<security:form-login
 		    login-page="/login"
@@ -38,5 +38,12 @@
 		</security:authentication-provider>
 
 	</security:authentication-manager>
+	<beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl">
+	</beans:bean>
+
+	<beans:bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
+		<beans:constructor-arg name="sessionRegistry" ref="sessionRegistry" />
+		<beans:property name="maximumSessions" value="1" />
+	</beans:bean>
 
 </beans:beans>

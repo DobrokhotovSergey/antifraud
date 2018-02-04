@@ -16,7 +16,6 @@ import java.util.Set;
 @Builder
 public class User {
     private String username;
-    @JsonIgnore
     private String password;
     private String position;
     private String firstname;
@@ -24,5 +23,5 @@ public class User {
     private boolean enabled;
     private boolean online;
     private Date lastLoginDate;
-    private Set<UserRole> userRole = new HashSet<UserRole>(0);
+    private UserRole userRole;
 }

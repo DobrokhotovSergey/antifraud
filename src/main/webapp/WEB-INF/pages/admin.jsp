@@ -37,31 +37,92 @@ scratch. This page gets rid of all links and provides the needed markup only.
 	<script src="resources/dist/js/html5shiv.min.js"></script>
 	<script src="resources/dist/js/respond.min.js"></script>
 	<![endif]-->
+	<link rel="stylesheet" href="/resources/singlePage/assets/css/spapp.css" />
 
 	<!-- Google Font -->
-	<link rel="stylesheet"
-		  href="resources/dist/css/google-font.css">
+	<link rel="stylesheet" href="resources/dist/css/google-font.css">
 </head>
-<!--
-BODY TAG OPTIONS:
-=================
-Apply one or more of the following classes to get the
-desired effect
-|---------------------------------------------------------|
-| SKINS         | skin-blue                               |
-|               | skin-black                              |
-|               | skin-purple                             |
-|               | skin-yellow                             |
-|               | skin-red                                |
-|               | skin-green                              |
-|---------------------------------------------------------|
-|LAYOUT OPTIONS | fixed                                   |
-|               | layout-boxed                            |
-|               | layout-top-nav                          |
-|               | sidebar-collapse                        |
-|               | sidebar-mini                            |
-|---------------------------------------------------------|
--->
+
+<div class="modal modal-form fade bs-example-modal-nm" id="update-profile-modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+	<div class="modal-dialog modal-nm">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" class="place-progress" id="update-profile">Обновление Профиля</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-md-5">
+
+						<!-- Profile Image -->
+						<div class="box box-primary">
+							<div class="box-body box-profile">
+								<img class="img-responsive" id="preload-profile" src="/admin/getAvatar/${login}"  onerror="this.src='/resources/project/images/admin.png'" alt="User profile picture">
+
+								<h3 class="profile-username text-center"></h3>
+								<p class="text-muted text-center" profile-username-position></p>
+							</div>
+							<input type="file"  name="file" id="fileLoader"  value="browse" onchange="readURL(this);" />
+							<input type="button" id="fileSubmit" value="change image"/>
+						</div>
+					</div>
+					<!-- /.col -->
+					<div class="col-md-7">
+						<div class="box box-primary" id="profile" class="x_panel">
+							<div class="box-header">
+								<i class="fa fa-user"></i>
+								<h3 class="box-title">Профиль</h3>
+
+							</div>
+							<!-- /.box-header -->
+							<div class="box-body">
+								<div class="x_content">
+									<form id="update-profile-form" data-parsley-validate class="form-horizontal form-label-left">
+										<%--<input id="update-profile-login" style="display: none" value="${login}">--%>
+										<div class="form-group">
+											<label class="control-label col-md-3 col-sm-3 col-xs-12" for="profile-name">Имя
+											</label>
+											<div class="col-md-9 col-sm-9 col-xs-12">
+												<input type="text" id="profile-name" name="firstname" value ="${firstname}"name="profileName" class="form-control" autocomplete="off">
+											</div>
+										</div>
+										<p>
+										<div class="form-group">
+											<label class="control-label col-md-3 col-sm-3 col-xs-12" for="profile-lastName">Фамилия
+											</label>
+											<div class="col-md-9 col-sm-9 col-xs-12">
+												<input type="text" id="profile-lastName" name="lastname" value ="${lastname}" name="profileLastName" class="form-control" autocomplete="off">
+											</div>
+										</div>
+										<p>
+										<div class="form-group">
+											<label class="control-label col-md-3 col-sm-3 col-xs-12" for="profile-position">Должность
+											</label>
+											<div class="col-md-9 col-sm-9 col-xs-12">
+												<input type="text" id="profile-position" name="position" value ="${position}" name="profileLastName" class="form-control" autocomplete="off">
+											</div>
+										</div>
+										<p>
+
+									</form>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+				<button type="submit" class="btn btn-success" id="update-profile-submit">Сохранить</button>
+			</div>
+
+		</div>
+	</div>
+</div>
+
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
 
@@ -193,31 +254,15 @@ desired effect
 						<ul class="dropdown-menu">
 							<!-- The user image in the menu -->
 							<li class="user-header">
-								<img src="resources/project/images/serg.png" class="img-circle" alt="User Image">
+								<img src="/admin/getAvatar/${login}" onerror="this.src='/resources/project/images/admin.png'"  class="img-circle" alt="User Image">
 
 								<p>
 									${firstname} ${lastname} - ${position}
 								</p>
 							</li>
-							<!-- Menu Body -->
-							<%--<li class="user-body">--%>
-								<%--<div class="row">--%>
-									<%--<div class="col-xs-4 text-center">--%>
-										<%--<a href="#">Followers</a>--%>
-									<%--</div>--%>
-									<%--<div class="col-xs-4 text-center">--%>
-										<%--<a href="#">Sales</a>--%>
-									<%--</div>--%>
-									<%--<div class="col-xs-4 text-center">--%>
-										<%--<a href="#">Friends</a>--%>
-									<%--</div>--%>
-								<%--</div>--%>
-								<%--<!-- /.row -->--%>
-							<%--</li>--%>
-							<!-- Menu Footer-->
 							<li class="user-footer">
 								<div class="pull-left">
-									<a href="#" class="btn btn-primary btn-flat">Профиль</a>
+									<a  class="btn btn-primary btn-flat" onclick="getProfile();">Профиль</a>
 								</div>
 								<div class="pull-right">
 									<a href="/logout" class="btn btn-primary btn-flat">Выйти</a>
@@ -242,44 +287,39 @@ desired effect
 			<!-- Sidebar user panel (optional) -->
 			<div class="user-panel">
 				<div class="pull-left image">
-					<img src="resources/project/images/serg.png" class="img-circle" alt="User Image">
+					<img src="/admin/getAvatar/${login}" onerror="this.src='/resources/project/images/admin.png'"  class="img-circle" alt="User Image">
 				</div>
 				<div class="pull-left info">
 					<p>${firstname} ${lastname}</p>
 					<!-- Status -->
-					<a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+					<a href="#"><i class="fa fa-circle text-success"></i> Онлайн</a>
 				</div>
 			</div>
-
-			<!-- search form (Optional) -->
-			<form action="#" method="get" class="sidebar-form">
-				<div class="input-group">
-					<input type="text" name="q" class="form-control" placeholder="Search...">
-					<span class="input-group-btn">
-              <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
-              </button>
-            </span>
-				</div>
-			</form>
-			<!-- /.search form -->
+>
 
 			<!-- Sidebar Menu -->
 			<ul class="sidebar-menu" data-widget="tree">
-				<li class="header">HEADER</li>
-				<!-- Optionally, you can add icons to the links -->
-				<li class="active"><a href="#"><i class="fa fa-link"></i> <span>Link</span></a></li>
-				<li><a href="#"><i class="fa fa-link"></i> <span>Another Link</span></a></li>
+				<li class="header">Главное</li>
 				<li class="treeview">
-					<a href="#"><i class="fa fa-link"></i> <span>Multilevel</span>
-						<span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-              </span>
+					<a href="#" onclick="return false">
+						<i class="fa fa-list"></i> <span>Таблица1</span>
 					</a>
-					<ul class="treeview-menu">
-						<li><a href="#">Link in level 2</a></li>
-						<li><a href="#">Link in level 2</a></li>
-					</ul>
 				</li>
+				<li class="treeview">
+					<a href="#" onclick="return false">
+						<i class="fa fa-list"></i> <span>Таблица2</span>
+					</a>
+				</li>
+				<!-- Optionally, you can add icons to the links -->
+				<li class="header">Управление Пользователями</li>
+				<%--<li class="treeview">--%>
+					<%--<a href="#" onclick="getPageUsers();return false">--%>
+						<%--<i class="fa fa-users"></i> <span>Пользователи</span>--%>
+					<%--</a>--%>
+				<%--</li>--%>
+				<li><a href="#users"><i class="fa fa-users"></i> <span>Пользователи</span></a></li>
+				<li><a href="#dashboard"><i class="fa fa-pie-chart"></i><span>Статистика</span></a></li>
+				<li><a href="#view_3">go to view 3</a></li>
 			</ul>
 			<!-- /.sidebar-menu -->
 		</section>
@@ -287,50 +327,12 @@ desired effect
 	</aside>
 
 	<!-- Content Wrapper. Contains page content -->
-	<div class="content-wrapper">
+	<div class="content-wrapper" id="spapp" role="main">
 		<!-- Content Header (Page header) -->
-		<section class="content-header">
-			<div class="box box-primary" id="employeeDiv" class="x_panel" style="display: none">
-				<div class="box-header">
-					<i class="ion ion-clipboard"></i>
-					<h3 class="box-title">Пользователи</h3>
-				</div>
-				<!-- /.box-header -->
-				<div class="box-body">
-					<div class="x_content">
-						<div class="table-responsive">
-							<table id="employee-table" class="table no-margin" style="width: 100%">
-								<thead>
-								<tr>
-									<th>id</th>
-									<th>Логин</th>
-									<th>Пользователь</th>
-
-									<%--<th>position</th>--%>
-									<th>Роль</th>
-									<th>Статус</th>
-									<th>Редактирование</th>
-								</tr>
-								</thead>
-								<tbody>
-
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- Main content -->
-		<section class="content container-fluid">
-
-			<!--------------------------
-              | Your Page Content Here |
-              -------------------------->
-
-		</section>
-		<!-- /.content -->
+		<section id="dashboard" class="content container-fluid"></section>
+		<section id="view_3" class="content container-fluid"><h1>view 3</h1></section>
+		<section id="error_404" class="content container-fluid"><h1>Page not found</h1></section>
+		<section id="users" class="content container-fluid" data-load="users"></section>
 	</div>
 	<!-- /.content-wrapper -->
 
@@ -434,11 +436,29 @@ desired effect
 <!-- Bootstrap 3.3.7 -->
 <script src="resources/bootstrap/js/bootstrap.min.js"></script>
 <link href="resources/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+
+<style>
+	.dataTables_wrapper .dt-buttons {
+		float: left;
+	}
+	.dataTables_wrapper .dataTables_filter {
+		float: right;
+		text-align: right;
+	}
+	.dataTables_wrapper .dataTables_length {
+		float: right;
+		text-align: right;
+		margin: auto;
+		width: 50%;
+	}
+
+</style>
+
 <script src="resources/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="resources/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
 <link href="resources/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
 <link href="resources/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
-<link href="resources/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+<%--<link href="resources/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">--%>
 <link href="resources/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
 <script src="resources/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
 <!-- AdminLTE App -->
@@ -446,21 +466,23 @@ desired effect
 <script src="resources/nprogress/nprogress.js"></script>
 <script src="resources/pnotify/pnotify.js"></script>
 <script src="resources/pnotify/pnotify.buttons.js"></script>
+<script src="resources/chartjs/Chart.js"></script>
 <script src="resources/build/js/custom.js"></script>
 <script src="resources/project/js/project.js"></script>
-
+<script src="resources/singlePage/assets/js/jquery.spapp.js"></script>
+<script src="resources/singlePage/assets/js/custom.js"></script>
 
 <!-- Optionally, you can add Slimscroll and FastClick plugins.
      Both of these plugins are recommended to enhance the
      user experience. -->
-<
+
 <style>
 	.spinner {
 		left: 50%;
 		margin-left: -4em;
 		color: red;
 	}
-</style>>
+</style>
 
 </body>
 </html>
