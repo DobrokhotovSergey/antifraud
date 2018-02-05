@@ -319,6 +319,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 				<%--</li>--%>
 				<li><a href="#users"><i class="fa fa-users"></i> <span>Пользователи</span></a></li>
 				<li><a href="#dashboard"><i class="fa fa-pie-chart"></i><span>Статистика</span></a></li>
+				<li><a href="#chat">Чат</a></li>
 				<li><a href="#view_3">go to view 3</a></li>
 			</ul>
 			<!-- /.sidebar-menu -->
@@ -333,6 +334,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 		<section id="view_3" class="content container-fluid"><h1>view 3</h1></section>
 		<section id="error_404" class="content container-fluid"><h1>Page not found</h1></section>
 		<section id="users" class="content container-fluid" data-load="users"></section>
+		<section id="chat" class="content container-fluid"><h1>Чат</h1></section>
 	</div>
 	<!-- /.content-wrapper -->
 
@@ -471,7 +473,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="resources/project/js/project.js"></script>
 <script src="resources/singlePage/assets/js/jquery.spapp.js"></script>
 <script src="resources/singlePage/assets/js/custom.js"></script>
-
+<script>
+    function getProfile(){
+        $('#update-profile-modal').modal('show');
+    };
+</script>
 <!-- Optionally, you can add Slimscroll and FastClick plugins.
      Both of these plugins are recommended to enhance the
      user experience. -->

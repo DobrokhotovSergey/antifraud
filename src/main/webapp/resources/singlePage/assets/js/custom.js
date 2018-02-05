@@ -17,6 +17,9 @@ $(document).ready(function() {
   app.route({view: 'dashboard', load: 'dashboard',onReady: function() {
       ajaxOnlineUsersChart();
   } });
+  app.route({view: 'chat', load: 'chat',onReady: function() {
+
+    } });
   app.route({
     view: 'view_3', 
     onCreate: function() { $("#view_3").append("I'm the third view"); }

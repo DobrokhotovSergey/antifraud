@@ -21,6 +21,7 @@ import ua.varus.antifraud.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -52,6 +53,12 @@ public class UserController {
 		return new ModelAndView("dashboard");
 	}
 
+	@RequestMapping(value = "/chat", method = RequestMethod.GET)
+	public ModelAndView chatPage(Principal principal){
+		ModelAndView model = new ModelAndView();
+		model.addObject("username", principal.getName());
+		return model;
+	}
 
 	private volatile Cache<String, byte[]> cache = CacheBuilder.newBuilder()
 			.concurrencyLevel(30)
