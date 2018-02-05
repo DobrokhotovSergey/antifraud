@@ -1,0 +1,5 @@
+#spapp > section { display: none; }
+#spapp > section:last-child { display: block; }
+@keyframes appear { from { width:0; opacity:0; } to { width:100%; opacity:1; } }
+#spapp > section:target { display: block; animation: appear 0.1s linear 1; }
+#spapp > section:target ~ * { display: none; }
